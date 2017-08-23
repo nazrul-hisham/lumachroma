@@ -1,0 +1,17 @@
+﻿﻿<div>
+    <h3><i class="fa fa-address-book"></i> Address Books</h3>
+    <table class="table table-condensed table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody data-bind="foreach: list">
+            <tr>
+                <td><span data-bind="text: ContactPerson">name</span></td>
+                <td><span data-bind="text: ContactInformation.Email">email</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
