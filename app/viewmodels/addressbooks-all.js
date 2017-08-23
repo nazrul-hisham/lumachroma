@@ -1,7 +1,7 @@
 ﻿define(['knockout'], function (ko) {
     var list = ko.observableArray([]),
     activate = function () {
-        var url = "http://lumachroma.azurewebsites.net";
+        var url = "https://lumachroma.azurewebsites.net";
         $.ajax({
             url: `${url}/api/address-books`,
             method: "GET"
