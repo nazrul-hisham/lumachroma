@@ -1,6 +1,5 @@
 ﻿define(['knockout'], function (ko) {
     var url = "https://lumachroma.azurewebsites.net";
-    var url = "http://localhost:50521";
     var isBusy = ko.observable(false),
         list = ko.observableArray([]),
         pagerSelf = ko.observable(null),
