@@ -4,7 +4,7 @@
         'durandal':'../lib/durandal/js',
         'plugins' : '../lib/durandal/js/plugins',
         'transitions' : '../lib/durandal/js/transitions',
-        'knockout': '../lib/knockout/knockout-3.4.0'
+        'knockout': '../lib/knockout/knockout-3.4.0',
         'jquery': '../lib/jquery/jquery-3.1.1'
         //TODO: Add moment.js
     }
