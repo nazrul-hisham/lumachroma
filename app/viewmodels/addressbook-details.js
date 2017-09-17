@@ -1,5 +1,6 @@
 ﻿define(['knockout', 'schemas', 'durandal/system', 'durandal/app', 'plugins/router'], function (ko, schemas, system, app, router) {
     var url = "https://lumachroma.azurewebsites.net";
+    //var url = "http://localhost:50521";
     var isBusy = ko.observable(false),
         id = ko.observable(),
         showEditForm = ko.observable(false),
@@ -38,7 +39,7 @@
             }).done(function (result) {
                 console.log(result);
                 isBusy(false);
-                app.showMessage("Successfully edited Address Book.", "MVC Durandal", ["OK"])
+                app.showMessage("Successfully edited.", "MVC Durandal", ["OK"])
                     .done(function (result) {
                         if (result == "OK") {
                             router.navigate("addressbooks-all");
@@ -62,7 +63,7 @@
             }).done(function (result) {
                 console.log(result);
                 isBusy(false);
-                app.showMessage("Successfully added Address Book.", "MVC Durandal", ["OK"])
+                app.showMessage("Successfully added.", "MVC Durandal", ["OK"])
                     .done(function (result) {
                         if (result == "OK") {
                             router.navigate("addressbooks-all");
@@ -73,6 +74,34 @@
                 console.log(e.statusText);
                 isBusy(false);
             });
+        },
+        deleteEntity = function () {
+            app.showMessage("Are you sure you want to delete?", "MVC Durandal", ["Yes", "No"])
+                .done(function (result) {
+                    if (result === "No") {
+                        return
+                    }
+                    $.ajax({
+                        url: `${url}/api/address-books/${id()}`,
+                        type: "DELETE",
+                        data: "{}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json"
+                    }).done(function (result) {
+                        console.log(result);
+                        isBusy(false);
+                        app.showMessage("Successfully deleted.", "MVC Durandal", ["OK"])
+                            .done(function (result) {
+                                if (result == "OK") {
+                                    router.navigate("addressbooks-all");
+                                }
+                            });
+                    }).fail(function (e) {
+                        console.log(e.status);
+                        console.log(e.statusText);
+                        isBusy(false);
+                    });
+                });
         },
         toggleShowEditForm = function () {
             showEditForm(!showEditForm());
@@ -96,6 +125,7 @@
         entity: entity,
         editEntity: editEntity,
         addEntity: addEntity,
+        deleteEntity: deleteEntity,
         showEditForm: showEditForm,
         toggleShowEditForm: toggleShowEditForm,
         backToEntityList: backToEntityList,

@@ -7,8 +7,9 @@
 
     <!--ko ifnot: showEditForm-->
     <div class="pull-right">
-        <button class="btn btn-default" data-bind="click: toggleShowEditForm">Edit</button>
-        <button class="btn btn-default" data-bind="click: $root.backToEntityList">Back</button>
+        <button class="btn btn-primary" data-bind="click: toggleShowEditForm">Edit</button>
+        <button class="btn btn-primary" data-bind="click: deleteEntity">Delete</button>
+        <button class="btn btn-default" data-bind="click: backToEntityList">Back</button>
     </div>
     <dl class="dl-horizontal" data-bind="with: entity">
         <dt>ReferenceNo</dt>
