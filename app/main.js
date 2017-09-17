@@ -5,7 +5,8 @@
         'plugins' : '../lib/durandal/js/plugins',
         'transitions' : '../lib/durandal/js/transitions',
         'knockout': '../lib/knockout/knockout-3.4.0',
-        'jquery': '../lib/jquery/jquery-3.1.1'
+        'jquery': '../lib/jquery/jquery-3.1.1',
+        'schemas': 'entitydefinition/schemas'
         //TODO: Add moment.js
     }
 });
