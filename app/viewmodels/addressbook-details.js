@@ -1,96 +1,36 @@
-﻿define(['knockout', 'schemas', 'durandal/system', 'durandal/app', 'plugins/router'], function (ko, schemas, system, app, router) {
-    var url = "https://lumachroma.azurewebsites.net";
-    //var url = "http://localhost:50521";
-    var isBusy = ko.observable(false),
-        id = ko.observable(),
-        showEditForm = ko.observable(false),
-        entity = ko.observable(new schemas.AddressBook(system.guid())),
-        activate = function (entityId) {
-            id(entityId);
-            if (!entityId || entityId === "0") {
-                entity(new schemas.AddressBook(system.guid()));
-                showEditForm(true);
-            } else {
-                isBusy(true);
-                $.ajax({
-                    url: `${url}/api/address-books/${id()}`,
-                    method: "GET"
-                }).done(function (result) {
-                    console.log(result);
-                    entity(new schemas.AddressBook(result._result));
-                    //console.log(ko.toJSON(entity));
-                    isBusy(false);
-                }).fail(function (e) {
-                    console.log(e.status);
-                    console.log(e.statusText);
-                    isBusy(false);
-                });
-            }
-        },
-        editEntity = function () {
-            var data = ko.toJSON(entity);
-            //console.log(data);
-            $.ajax({
-                url: `${url}/api/address-books/${id()}`,
-                type: "PUT",
-                data: data,
-                contentType: "application/json; charset=utf-8",
-                dataType: "json"
-            }).done(function (result) {
-                console.log(result);
-                isBusy(false);
-                app.showMessage("Successfully edited.", "MVC Durandal", ["OK"])
+﻿define(['knockout', 'schemas', 'durandal/system', 'durandal/app', 'plugins/router', 'services/datacontext'],
+    function (ko, schemas, system, app, router, context) {
+        var url = "https://lumachroma.azurewebsites.net";
+        var isBusy = ko.observable(false),
+            id = ko.observable(),
+            showEditForm = ko.observable(false),
+            entity = ko.observable(new schemas.AddressBook(system.guid())),
+            activate = function (entityId) {
+                id(entityId);
+                if (!entityId || entityId === "0") {
+                    entity(new schemas.AddressBook(system.guid()));
+                    showEditForm(true);
+                } else {
+                    isBusy(true);
+                    context.get(`${url}/api/address-books/${id()}`, true, {})
+                        .done(function (result) {
+                            console.log(result);
+                            entity(new schemas.AddressBook(result._result));
+                            //console.log(ko.toJSON(entity));
+                            isBusy(false);
+                        }).fail(function (e) {
+                            console.log(e.status);
+                            console.log(e.statusText);
+                            isBusy(false);
+                        });
+                }
+            },
+            defultOperationEndpoint = function (json, endpoint, verb, successMessage) {
+                context.send(json, `${url}/${endpoint}`, verb)
                     .done(function (result) {
-                        if (result == "OK") {
-                            router.navigate("addressbooks-all");
-                        }
-                    });
-            }).fail(function (e) {
-                console.log(e.status);
-                console.log(e.statusText);
-                isBusy(false);
-            });
-        },
-        addEntity = function () {
-            var data = ko.toJSON(entity);
-            //console.log(data);
-            $.ajax({
-                url: `${url}/api/address-books`,
-                type: "POST",
-                data: data,
-                contentType: "application/json; charset=utf-8",
-                dataType: "json"
-            }).done(function (result) {
-                console.log(result);
-                isBusy(false);
-                app.showMessage("Successfully added.", "MVC Durandal", ["OK"])
-                    .done(function (result) {
-                        if (result == "OK") {
-                            router.navigate("addressbooks-all");
-                        }
-                    });
-            }).fail(function (e) {
-                console.log(e.status);
-                console.log(e.statusText);
-                isBusy(false);
-            });
-        },
-        deleteEntity = function () {
-            app.showMessage("Are you sure you want to delete?", "MVC Durandal", ["Yes", "No"])
-                .done(function (result) {
-                    if (result === "No") {
-                        return
-                    }
-                    $.ajax({
-                        url: `${url}/api/address-books/${id()}`,
-                        type: "DELETE",
-                        data: "{}",
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json"
-                    }).done(function (result) {
                         console.log(result);
                         isBusy(false);
-                        app.showMessage("Successfully deleted.", "MVC Durandal", ["OK"])
+                        app.showMessage(successMessage, "MVC Durandal", ["OK"])
                             .done(function (result) {
                                 if (result == "OK") {
                                     router.navigate("addressbooks-all");
@@ -101,38 +41,64 @@
                         console.log(e.statusText);
                         isBusy(false);
                     });
-                });
-        },
-        toggleShowEditForm = function () {
-            showEditForm(!showEditForm());
-        },
-        backToEntityList = function () {
-            router.navigate("addressbooks-all");
-        },
-        attached = function () {
+            },
+            editEntity = function () {
+                var data = ko.toJSON(entity);
+                var endpoint = `api/address-books/${id()}`;
+                var msg = "Successfully edited.";
+                //console.log(data);
+                defultOperationEndpoint(data, endpoint, "PUT", msg);
+            },
+            addEntity = function () {
+                var data = ko.toJSON(entity);
+                var endpoint = "api/address-books";
+                var msg = "Successfully added.";
+                //console.log(data);
+                defultOperationEndpoint(data, endpoint, "POST", msg);
+            },
+            deleteEntity = function () {
+                var data = ko.toJSON(entity);
+                var endpoint = `api/address-books/${id()}`;
+                var msg = "Successfully deleted.";
+                //console.log(data);
+                app.showMessage("Are you sure you want to delete?", "MVC Durandal", ["Yes", "No"])
+                    .done(function (result) {
+                        if (result === "No") {
+                            return
+                        }
+                        defultOperationEndpoint(data, endpoint, "DELETE", msg);
+                    });
+            },
+            toggleShowEditForm = function () {
+                showEditForm(!showEditForm());
+            },
+            backToEntityList = function () {
+                router.navigate("addressbooks-all");
+            },
+            attached = function () {
 
-        },
-        compositionComplete = function () {
+            },
+            compositionComplete = function () {
 
-        },
-        deactivate = function () {
-            id(null);
-            showEditForm(false);
+            },
+            deactivate = function () {
+                id(null);
+                showEditForm(false);
+            };
+
+        return {
+            id: id,
+            entity: entity,
+            editEntity: editEntity,
+            addEntity: addEntity,
+            deleteEntity: deleteEntity,
+            showEditForm: showEditForm,
+            toggleShowEditForm: toggleShowEditForm,
+            backToEntityList: backToEntityList,
+            isBusy: isBusy,
+            activate: activate,
+            attached: attached,
+            compositionComplete: compositionComplete,
+            deactivate: deactivate
         };
-
-    return {
-        id: id,
-        entity: entity,
-        editEntity: editEntity,
-        addEntity: addEntity,
-        deleteEntity: deleteEntity,
-        showEditForm: showEditForm,
-        toggleShowEditForm: toggleShowEditForm,
-        backToEntityList: backToEntityList,
-        isBusy: isBusy,
-        activate: activate,
-        attached: attached,
-        compositionComplete: compositionComplete,
-        deactivate: deactivate
-    };
-});
+    });
